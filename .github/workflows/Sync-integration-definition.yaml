@@ -45,16 +45,16 @@ jobs:
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
             echo "version exist"
-            echo "new_version_exist=true" >> $GITHUB_OUTPUT
+            echo "new_version_exist=true" >> $GITHUB_ENV
           else
-            echo "new_version_exist=false" >> $GITHUB_OUTPUT
+            echo "new_version_exist=false" >> $GITHUB_ENV
             echo "version Not exist"
           fi
 
 
       - name: Create files for the new version
+        if: "${{env.new_version_exist == 'false'}}"
         run: |
-          echo "${{ needs.version_exist.outputs.new_version_exist}}"
           branch_name=${GITHUB_REF##*/}
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
