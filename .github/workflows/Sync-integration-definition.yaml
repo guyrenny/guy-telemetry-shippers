@@ -39,12 +39,15 @@ jobs:
       - name: Check if version exists
         id: version_exist
         run: | 
+          branch_name=${GITHUB_REF##*/}
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
-          if [ -d "./integrations/otel-agent-k8s/$template_version" ]; then
+          if [ -d "./integrations/otel-agent-k8s/$template_version" ] || [ -n "$(git ls-remote origin $branch_name)"]; then
             echo "version exist"
+            pwd
             ls ./integrations/otel-agent-k8s/
             echo "new_version_exist=true" >> $GITHUB_OUTPUT
           else
+            ls ./integrations/otel-agent-k8s/
             echo "version Not exist"
           fi
 
