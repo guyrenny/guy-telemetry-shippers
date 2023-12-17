@@ -89,7 +89,8 @@ jobs:
       - name: Create pull request
         run: |
           branch_name=${GITHUB_REF##*/}
-          Pr_name=$(echo "${{ github.event.pull_request.title }}")
+          # Pr_name=$(echo "${{ github.event.pull_request.title }}")
+          Pr_name="pe name"
           pr_exists=$(gh pr list --base master --head "${branch_name}" --json number -q '.[].number')
           if [[ -n "$pr_exists" ]]; then
             echo "Pull request already exists: #$pr_exists"
