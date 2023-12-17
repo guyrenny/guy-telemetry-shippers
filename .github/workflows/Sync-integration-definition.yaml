@@ -41,7 +41,7 @@ jobs:
       - name: Check if version exists
         id: version_exist
         run: | 
-          branch_name=${GITHUB_REF##*/}
+          branch_name=${{ github.event.pull_request.head.ref }}
           git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -n "$(git ls-remote origin $branch_name)" ]; then
