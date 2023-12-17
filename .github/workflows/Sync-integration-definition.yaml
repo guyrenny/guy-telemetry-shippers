@@ -3,7 +3,7 @@ name: Sync integration-definitions
 on: 
   push:
   pull_request:
-    types: [closed]
+    types: [closed,opened]
     branches: [master]
     paths:
     - 'otel-integration/k8s-helm/**'
