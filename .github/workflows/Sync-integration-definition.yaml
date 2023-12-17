@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Create files for the new version
-        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           echo $branch_name
@@ -71,7 +71,12 @@ jobs:
           current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/v${template_version}
-          cp integrations/otel-agent-k8s/v0.0.21/commands.yaml integrations/otel-agent-k8s/v${template_version}/
+          last_version=$(grep  "revision: " integrations/otel-agent-k8s/manifest.yaml | tail -n 1 | grep -oE '[^ ]+$')
+
+          cp integrations/otel-agent-k8s/v$last_version/commands.yaml integrations/otel-agent-k8s/v${template_version}/
+          cp integrations/otel-agent-k8s/v$last_version/fields.yaml integrations/otel-agent-k8s/v${template_version}/
+          cp integrations/otel-agent-k8s/v$last_version/integration_guide.yaml integrations/otel-agent-k8s/v${template_version}/
+          
           sed -i "s/--version=[^[:space:]]*/--version=$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
           if [ -f integrations/otel-agent-k8s/manifest.yaml ]; then
             echo "    - revision: ${template_version}
@@ -88,7 +93,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
-        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -99,7 +104,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
-        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           # Pr_name=$(echo "${{ github.event.pull_request.title }}")
