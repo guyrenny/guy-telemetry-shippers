@@ -46,12 +46,11 @@ jobs:
             echo "new_version_exist=true" >> $GITHUB_OUTPUT
           else
             echo "version Not exist"
-            echo "new_version_exist=false" >> $GITHUB_OUTPUT
           fi
 
 
       - name: Create files for the new version
-        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'true' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           echo $branch_name
@@ -80,13 +79,13 @@ jobs:
           echo start_sed
           sed -i "s/--version=[^[:space:]]*/--version=$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
           if [ -f ./integrations/otel-agent-k8s/manifest.yaml ]; then
-            echo "    - revision: ${template_version}
-                template:
-                  type: HelmChart
-                  commands: v${template_version}/commands.yaml
-                  integration_guide: v${template_version}/integration_guide.yaml
-                field_definitions: v${template_version}/fields.yaml
-                published_at: $current_time" >> integrations/otel-agent-k8s/manifest.yaml
+            echo "  - revision: ${template_version}
+              template:
+                type: HelmChart
+                commands: v${template_version}/commands.yaml
+                integration_guide: v${template_version}/integration_guide.yaml
+              field_definitions: v${template_version}/fields.yaml
+              published_at: $current_time" >> integrations/otel-agent-k8s/manifest.yaml
           fi
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
@@ -94,7 +93,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
-        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'true' }}
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -105,7 +104,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
-        if: ${{ needs.version_exist.outputs.new_version_exist != 'false' }}
+        if: ${{ needs.version_exist.outputs.new_version_exist != 'true' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           # Pr_name=$(echo "${{ github.event.pull_request.title }}")
