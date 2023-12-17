@@ -69,8 +69,6 @@ jobs:
                 field_definitions: v${template_version}/fields.yaml
                 published_at: 2023-12-13T00:00:00Z" >> integrations/otel-agent-k8s/manifest.yaml
           fi
-
-
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
         env:
