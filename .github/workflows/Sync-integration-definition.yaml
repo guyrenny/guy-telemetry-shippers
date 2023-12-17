@@ -53,46 +53,48 @@ jobs:
 
 
       - name: Create files for the new version
-        if: "${{ needs.version_exist.outputs.new_version_exist == 'false' }}"
         run: |
           echo "${{ needs.version_exist.outputs.new_version_exist}}"
           branch_name=${GITHUB_REF##*/}
-          echo $branch_name
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git pull origin master
-          git fetch origin
-          git switch -c ${branch_name} --track origin/master 
-          pr_exists=$(gh pr list --base master --head "${branch_name}" --json number -q '.[].number')
-          if [[ -z "$pr_exists" ]]; then
-            git push --set-upstream origin ${branch_name}
-          fi
-          sync_branch_exists=$(git ls-remote --heads origin "${branch_name}" | wc -l)
-          if [[ $sync_branch_exists -ne 0 ]]; then
-            git pull origin ${branch_name} --rebase
-          fi
-          current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
-          mkdir -p integrations/otel-agent-k8s/v${template_version}
-          echo Get_vesrion2
-          last_version=$(grep  "revision: " ./integrations/otel-agent-k8s/manifest.yaml | tail -n 1 | grep -oE '[^ ]+$')
-          echo start_cp
-          cp integrations/otel-agent-k8s/v$last_version/commands.yaml integrations/otel-agent-k8s/v${template_version}/
-          cp integrations/otel-agent-k8s/v$last_version/fields.yaml integrations/otel-agent-k8s/v${template_version}/
-          cp integrations/otel-agent-k8s/v$last_version/integration_guide.yaml integrations/otel-agent-k8s/v${template_version}/
-          echo start_sed
-          sed -i "s/--version=[^[:space:]]*/--version=$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
-          if [ -f ./integrations/otel-agent-k8s/manifest.yaml ]; then
-            echo "  - revision: ${template_version}
-              template:
-                type: HelmChart
-                commands: v${template_version}/commands.yaml
-                integration_guide: v${template_version}/integration_guide.yaml
-              field_definitions: v${template_version}/fields.yaml
-              published_at: $current_time" >> integrations/otel-agent-k8s/manifest.yaml
+          if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
+            echo $branch_name
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git pull origin master
+            git fetch origin
+            git switch -c ${branch_name} --track origin/master 
+            pr_exists=$(gh pr list --base master --head "${branch_name}" --json number -q '.[].number')
+            if [[ -z "$pr_exists" ]]; then
+              git push --set-upstream origin ${branch_name}
+            fi
+            sync_branch_exists=$(git ls-remote --heads origin "${branch_name}" | wc -l)
+            if [[ $sync_branch_exists -ne 0 ]]; then
+              git pull origin ${branch_name} --rebase
+            fi
+            current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
+            mkdir -p integrations/otel-agent-k8s/v${template_version}
+            echo Get_vesrion2
+            last_version=$(grep  "revision: " ./integrations/otel-agent-k8s/manifest.yaml | tail -n 1 | grep -oE '[^ ]+$')
+            echo start_cp
+            cp integrations/otel-agent-k8s/v$last_version/commands.yaml integrations/otel-agent-k8s/v${template_version}/
+            cp integrations/otel-agent-k8s/v$last_version/fields.yaml integrations/otel-agent-k8s/v${template_version}/
+            cp integrations/otel-agent-k8s/v$last_version/integration_guide.yaml integrations/otel-agent-k8s/v${template_version}/
+            echo start_sed
+            sed -i "s/--version=[^[:space:]]*/--version=$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
+            if [ -f ./integrations/otel-agent-k8s/manifest.yaml ]; then
+              echo "  - revision: ${template_version}
+                template:
+                  type: HelmChart
+                  commands: v${template_version}/commands.yaml
+                  integration_guide: v${template_version}/integration_guide.yaml
+                field_definitions: v${template_version}/fields.yaml
+                published_at: $current_time" >> integrations/otel-agent-k8s/manifest.yaml
+            fi
+            git add .
+            echo "branch_name=$branch_name" >> $GITHUB_ENV
           fi
-          git add .
-          echo "branch_name=$branch_name" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
