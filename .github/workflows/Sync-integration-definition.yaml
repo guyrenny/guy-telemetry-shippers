@@ -55,6 +55,7 @@ jobs:
       - name: Create files for the new version
         if: "${{ needs.version_exist.outputs.new_version_exist == 'false' }}"
         run: |
+          echo "${{ needs.version_exist.outputs.new_version_exist}}"
           branch_name=${GITHUB_REF##*/}
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
