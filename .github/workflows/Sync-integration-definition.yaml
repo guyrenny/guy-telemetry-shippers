@@ -1,10 +1,11 @@
 name: Sync integration-definitions
 
 on: 
-  push:
-    # branches: [master, main]
-    # paths:
-    #   - "**/template.yaml"
+  pull_request:
+    types: [merge]
+    branches: [master]
+    paths:
+    
 jobs:
   Get_vesrion:
     runs-on: ubuntu-latest
@@ -43,11 +44,8 @@ jobs:
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
             echo "version exist"
-            pwd
-            ls ./integrations/otel-agent-k8s/
             echo "new_version_exist=true" >> $GITHUB_OUTPUT
           else
-            ls ./integrations/otel-agent-k8s/
             echo "version Not exist"
           fi
 
@@ -96,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
-        if: "${{ needs.version_exist.outputs.new_version_exist != 'true' }}"
+        if: "${{ needs.version_exist.outputs.new_version_exist == 'true' }}"
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -107,11 +105,11 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
-        if: "${{ needs.version_exist.outputs.new_version_exist != 'true' }}"
+        if: "${{ needs.version_exist.outputs.new_version_exist == 'true' }}"
         run: |
           branch_name=${GITHUB_REF##*/}
-          # Pr_name=$(echo "${{ github.event.pull_request.title }}")
-          Pr_name="pe name"
+          Pr_name=$(echo "${{ github.event.pull_request.title }}")
+          # Pr_name="pe name"
           pr_exists=$(gh pr list --base master --head "${branch_name}" --json number -q '.[].number')
           if [[ -n "$pr_exists" ]]; then
             echo "Pull request already exists: #$pr_exists"
