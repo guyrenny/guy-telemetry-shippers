@@ -36,7 +36,17 @@ jobs:
           repository: guyrenny/test
           token: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
+      - name: Check if version exists
+        id: version_exist
+        run: | 
+          template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
+          if [ -d "integrations/otel-agent-k8s/$template_version" ]; then
+            echo "new_version_exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "new_version_exist=false" >> $GITHUB_OUTPUT
+
       - name: Create files for the new version
+        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           echo $branch_name
@@ -74,6 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
+        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -84,6 +95,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
+        if: ${{ needs.version_exist.outputs.new_version_exist == 'false' }}
         run: |
           branch_name=${GITHUB_REF##*/}
           # Pr_name=$(echo "${{ github.event.pull_request.title }}")
