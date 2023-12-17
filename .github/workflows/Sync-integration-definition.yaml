@@ -72,14 +72,14 @@ jobs:
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/v${template_version}
           echo Get_vesrion
-          last_version=$(grep  "revision: " integrations/otel-agent-k8s/manifest.yaml | tail -n 1 | grep -oE '[^ ]+$')
+          last_version=$(grep  "revision: " ./integrations/otel-agent-k8s/manifest.yaml | tail -n 1 | grep -oE '[^ ]+$')
           echo start_cp
           cp integrations/otel-agent-k8s/v$last_version/commands.yaml integrations/otel-agent-k8s/v${template_version}/
           cp integrations/otel-agent-k8s/v$last_version/fields.yaml integrations/otel-agent-k8s/v${template_version}/
           cp integrations/otel-agent-k8s/v$last_version/integration_guide.yaml integrations/otel-agent-k8s/v${template_version}/
           echo start_sed
           sed -i "s/--version=[^[:space:]]*/--version=$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
-          if [ -f integrations/otel-agent-k8s/manifest.yaml ]; then
+          if [ -f ./integrations/otel-agent-k8s/manifest.yaml ]; then
             echo "    - revision: ${template_version}
                 template:
                   type: HelmChart
