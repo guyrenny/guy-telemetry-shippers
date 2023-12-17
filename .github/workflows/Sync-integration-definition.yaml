@@ -41,8 +41,11 @@ jobs:
         run: | 
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "integrations/otel-agent-k8s/$template_version" ]; then
+            echo "version exist"
+            ls integrations/otel-agent-k8s/
             echo "new_version_exist=true" >> $GITHUB_OUTPUT
           else
+            echo "version Not exist"
             echo "new_version_exist=false" >> $GITHUB_OUTPUT
           fi
 
