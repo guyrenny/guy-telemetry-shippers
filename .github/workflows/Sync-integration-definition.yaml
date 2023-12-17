@@ -47,6 +47,7 @@ jobs:
             echo "version exist"
             echo "new_version_exist=true" >> $GITHUB_OUTPUT
           else
+            echo "new_version_exist=false" >> $GITHUB_OUTPUT
             echo "version Not exist"
           fi
 
