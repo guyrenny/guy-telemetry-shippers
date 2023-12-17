@@ -54,11 +54,11 @@ jobs:
             git pull origin ${branch_name} --rebase
           fi
 
-
+          current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/v${template_version}
           cp integrations/otel-agent-k8s/v0.0.21/commands.yaml integrations/otel-agent-k8s/v${template_version}/
-          sed -i 's/--version=[^[:space:]]*/--version=\$template_version/' integrations/otel-agent-k8s/v${template_version}/commands.yaml
+          sed -i "s/--version=[^[:space:]]*/--version=\$template_version/" integrations/otel-agent-k8s/v${template_version}/commands.yaml
           if [ -f integrations/otel-agent-k8s/manifest.yaml ]; then
             echo "    - revision: ${template_version}
                 template:
@@ -66,7 +66,7 @@ jobs:
                   commands: v${template_version}/commands.yaml
                   integration_guide: v${template_version}/integration_guide.yaml
                 field_definitions: v${template_version}/fields.yaml
-                published_at: 2023-12-13T00:00:00Z" >> integrations/otel-agent-k8s/manifest.yaml
+                published_at: $current_time" >> integrations/otel-agent-k8s/manifest.yaml
           fi
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
