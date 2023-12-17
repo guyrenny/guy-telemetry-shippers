@@ -1,11 +1,12 @@
 name: Sync integration-definitions
 
 on: 
-  pull_request:
-    types: [closed]
-    branches: [master]
-    paths:
-    - 'otel-integration/k8s-helm/**'
+  push:
+  # pull_request:
+  #   types: [closed]
+  #   branches: [master]
+  #   paths:
+  #   - 'otel-integration/k8s-helm/**'
 jobs:
   Get_vesrion:
     runs-on: ubuntu-latest
