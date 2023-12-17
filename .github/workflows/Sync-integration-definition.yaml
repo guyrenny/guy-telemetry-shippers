@@ -58,7 +58,7 @@ jobs:
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/v${template_version}
           cp integrations/otel-agent-k8s/v0.0.21/commands.yaml integrations/otel-agent-k8s/v${template_version}/
-          sed -i 's/--version=[^[:space:]]*/--version=${template_version}/' integrations/otel-agent-k8s/v${template_version}/commands.yaml
+          sed -i 's/--version=[^[:space:]]*/--version=$template_version/' integrations/otel-agent-k8s/v${template_version}/commands.yaml
           if [ -f integrations/otel-agent-k8s/manifest.yaml ]; then
             echo "    - revision: ${template_version}
                 template:
