@@ -42,6 +42,7 @@ jobs:
         id: version_exist
         run: | 
           branch_name=${GITHUB_REF##*/}
+          git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -n "$(git ls-remote origin $branch_name)" ]; then
             ls ./integrations/otel-agent-k8s
@@ -52,6 +53,7 @@ jobs:
           else
             echo "new_version_exist=false" >> $GITHUB_ENV
             echo "version Not exist"
+            echo $branch_name
           fi
 
 
