@@ -16,10 +16,6 @@ jobs:
         with:
           fetch-depth: 0 
 
-      # - name: Get changed files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v37
-
       - name: Get the new version
         id: New_version
         run: |
@@ -60,7 +56,7 @@ jobs:
 
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/${template_version}
-          cp integrations/otel-agent-k8s/v0.0.21/commands.yaml integrations/otel-agent-k8s/${template_version}
+          cp integrations/otel-agent-k8s/v0.0.21 /commands.yaml integrations/otel-agent-k8s/${template_version}
           if [ -f integrations/otel-agent-k8s/manifest.yaml ]; then
             echo "    - revision: ${template_version}
                 template:
