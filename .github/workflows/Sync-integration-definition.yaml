@@ -48,6 +48,7 @@ jobs:
             git branch
             echo "version exist"
             echo "new_version_exist=true" >> $GITHUB_ENV
+            echo $branch_name
           else
             echo "new_version_exist=false" >> $GITHUB_ENV
             echo "version Not exist"
