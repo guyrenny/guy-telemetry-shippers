@@ -1,11 +1,12 @@
 name: Sync integration-definitions
 
 on: 
-  pull_request:
-    types: [closed]
-    branches: [master]
-    paths:
-    - 'otel-integration/k8s-helm/**'
+  push:
+  # pull_request:
+  #   types: [closed]
+  #   branches: [master]
+  #   paths:
+  #   - 'otel-integration/k8s-helm/**'
 jobs:
   Get_vesrion:
     runs-on: ubuntu-latest
@@ -43,6 +44,7 @@ jobs:
           branch_name=${GITHUB_REF##*/}
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
+            ls ./integrations/otel-agent-k8s"
             echo "version exist"
             echo "new_version_exist=true" >> $GITHUB_ENV
           else
