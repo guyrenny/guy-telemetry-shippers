@@ -41,7 +41,10 @@ jobs:
       - name: Check if version exists
         id: version_exist
         run: | 
-          branch_name="${{ github.event.pull_request.head.ref }}-" + date +"%m-%d-%H-%M"
+          branch_name="${{ github.event.pull_request.head.ref }}"
+          if [ -z "$branch_name" ]; then
+            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
+          fi
           git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
@@ -56,9 +59,9 @@ jobs:
       - name: Create files for the new version
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="${{ github.event.pull_request.head.ref }}-" + date +"%m-%d-%H-%M"
+          branch_name="${{ github.event.pull_request.head.ref }}"
           if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch"
+            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
           fi
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -104,9 +107,9 @@ jobs:
       - name: Create pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="${{ github.event.pull_request.head.ref }}-" + date +"%m-%d-%H-%M"
+          branch_name="${{ github.event.pull_request.head.ref }"
           if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch"
+            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
           fi
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
           if [ -z "$Pr_name" ]; then
