@@ -57,8 +57,8 @@ jobs:
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
-          if [ $branch_name == "" ]; then
-            branch_name=sync-default-branch
+          if [ -z "$branch_name" ]; then
+            branch_name="sync-default-branch"
           fi
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
