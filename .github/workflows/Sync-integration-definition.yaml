@@ -54,7 +54,7 @@ jobs:
 
 
       - name: Create files for the new version
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
           echo $branch_name
@@ -88,7 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -99,7 +99,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
