@@ -105,7 +105,13 @@ jobs:
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
+          if [ -z "$branch_name" ]; then
+            branch_name="sync-default-branch"
+          fi
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
+          if [ -z "$Pr_name" ]; then
+            Pr_name="sync-from-telemetry-shippers"
+          fi
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
         env:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
