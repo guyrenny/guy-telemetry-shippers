@@ -36,7 +36,7 @@ jobs:
         with:
           repository: guyrenny/test
           ref: ${{  github.event.pull_request.head.sha }}
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: Check if version exists
         id: version_exist
@@ -85,7 +85,7 @@ jobs:
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
         if: "${{env.new_version_exist == 'false'}}"
@@ -96,7 +96,7 @@ jobs:
           branch: ${{env.branch_name}}
           file_pattern: '*.yaml *.md'
         env:
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
         if: "${{env.new_version_exist == 'false'}}"
@@ -105,4 +105,4 @@ jobs:
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
