@@ -92,7 +92,7 @@ jobs:
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
-          repo: coralogix/integration-definitions
+          repo: guyrenny/test
           branch: ${{env.branch_name}}
           file_pattern: '*.yaml *.md'
         env:
