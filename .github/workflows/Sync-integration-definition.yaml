@@ -107,7 +107,7 @@ jobs:
       - name: Create pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="${{ github.event.pull_request.head.ref }"
+          branch_name="${{ github.event.pull_request.head.ref }}"
           if [ -z "$branch_name" ]; then
             branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
           fi
