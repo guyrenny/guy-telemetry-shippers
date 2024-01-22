@@ -43,7 +43,7 @@ jobs:
         run: | 
           branch_name="${{ github.event.pull_request.head.ref }}"
           if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
+            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
           fi
           git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
@@ -61,7 +61,7 @@ jobs:
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
           if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
+            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
           fi
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -109,7 +109,7 @@ jobs:
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}"
           if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch-" + date +"%m-%d-%H-%M"
+            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
           fi
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
           if [ -z "$Pr_name" ]; then
