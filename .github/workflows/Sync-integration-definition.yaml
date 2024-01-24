@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
     - 'otel-integration/k8s-helm/Chart.yaml'
+  pull_request:
+    branches: [master]
+    paths:
+    - 'otel-integration/k8s-helm/Chart.yaml'
   workflow_dispatch:
 jobs:
   Get_vesrion:
