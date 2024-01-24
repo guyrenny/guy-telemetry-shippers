@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v3
 name: otel-integration
 description: OpenTelemetry Integration
 version: 0.0.101
