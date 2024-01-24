@@ -1,8 +1,8 @@
 name: Sync with integration-definitions
 
 on: 
-  pull_request:
-    types: [closed]
+  push:
+    # types: [open]
     branches: [master]
     paths:
     - 'otel-integration/k8s-helm/Chart.yaml'
