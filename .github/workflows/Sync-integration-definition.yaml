@@ -1,8 +1,8 @@
 name: Sync with integration-definitions
 
 on: 
-  pull_request:
-    types: [closed]
+  push:
+    # types: [open]
     branches: [master]
     paths:
     - 'otel-integration/k8s-helm/Chart.yaml'
@@ -42,6 +42,9 @@ jobs:
         id: version_exist
         run: | 
           branch_name="${{ github.event.pull_request.head.ref }}"
+          if [ -z "$branch_name" ]; then
+            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
+          fi
           git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
@@ -54,7 +57,7 @@ jobs:
 
 
       - name: Create files for the new version
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}-"+ date +"%m-%d-%H-%M"
           echo $branch_name
@@ -88,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
@@ -99,10 +102,13 @@ jobs:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
-        if: "${{env.new_version_exist == 'false'}}"
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="${{ github.event.pull_request.head.ref }}-"+ date +"%m-%d-%H-%M"
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
+          if [ -z "$Pr_name" ]; then
+            Pr_name="sync-from-telemetry-shippers"
+          fi
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
         env:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
