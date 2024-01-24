@@ -59,10 +59,7 @@ jobs:
       - name: Create files for the new version
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="${{ github.event.pull_request.head.ref }}"
-          if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
-          fi
+          branch_name="${{ github.event.pull_request.head.ref }}-"+ date +"%m-%d-%H-%M"
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -107,10 +104,7 @@ jobs:
       - name: Create pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="${{ github.event.pull_request.head.ref }}"
-          if [ -z "$branch_name" ]; then
-            branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
-          fi
+          branch_name="${{ github.event.pull_request.head.ref }}-"+ date +"%m-%d-%H-%M"
           Pr_name=$(echo "${{ github.event.pull_request.title }}")
           if [ -z "$Pr_name" ]; then
             Pr_name="sync-from-telemetry-shippers"
