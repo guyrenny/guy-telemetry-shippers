@@ -1,11 +1,6 @@
 name: Sync with integration-definitions
-
 on: 
   push:
-    branches: [master]
-    paths:
-    - 'otel-integration/k8s-helm/Chart.yaml'
-  pull_request:
     branches: [master]
     paths:
     - 'otel-integration/k8s-helm/Chart.yaml'
@@ -26,23 +21,20 @@ jobs:
         run: |
           Chart_version=$(cat ./otel-integration/k8s-helm/Chart.yaml | grep "^version" | grep -oE '[^ ]+$')
           echo "Chart_version=$Chart_version" >> $GITHUB_OUTPUT
-
-
   create_pr:
     runs-on: ubuntu-latest
     needs: Get_vesrion
     steps:
-
       - name: Checkout destination repository
         uses: actions/checkout@v3
         with:
-          repository: guyrenny/test
-          token: ${{ secrets.DESTINATION_REPO_TOKEN }}
+          repository: coralogix/integration-definitions
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Check if version exists
         id: version_exist
         run: | 
-          branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
+          branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
           git fetch origin
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           if [ -d "./integrations/otel-agent-k8s/v$template_version" ] || [ -n "$(git ls-remote origin $branch_name)" ]; then
@@ -57,7 +49,7 @@ jobs:
       - name: Create files for the new version
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
+          branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
           echo $branch_name
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -86,27 +78,27 @@ jobs:
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: commit change
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
-          repo: guyrenny/test
+          repo: coralogix/integration-definitions
           branch: ${{env.branch_name}}
           file_pattern: '*.yaml *.md'
         env:
-          GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
 
       - name: Create pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
-          branch_name="sync-default-branch-$(date +"%m-%d-%H-%M")"
+          branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
           Pr_name=$(echo "${{ github.event.head_commit.message }}")
           if [ -z "$Pr_name" ]; then
             Pr_name="sync-from-telemetry-shippers"
           fi
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
         env:
-          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
