@@ -9,6 +9,8 @@ keywords:
   - Kubernetes
   - Coralogix
 dependencies:
+
+
   - name: opentelemetry-collector
     alias: opentelemetry-agent
     version: "0.78.0"
