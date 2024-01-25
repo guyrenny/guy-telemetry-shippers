@@ -95,7 +95,7 @@ jobs:
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
-          Pr_name=$(echo "${{ github.event.commits[0].message }}")
+          Pr_name=$(echo "${{ github.event.head_commit.message }}")
           if [ -z "$Pr_name" ]; then
             Pr_name="sync-from-telemetry-shippers"
           fi
