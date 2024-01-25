@@ -28,8 +28,8 @@ jobs:
       - name: Checkout destination repository
         uses: actions/checkout@v3
         with:
-          repository: coralogix/integration-definitions
-          token: ${{ secrets.GH_TOKEN }}
+          repository: guyrenny/test
+          token: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: Check if version exists
         id: version_exist
@@ -78,18 +78,18 @@ jobs:
           git add .
           echo "branch_name=$branch_name" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
 
       - name: commit change
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         uses: planetscale/ghcommit-action@v0.1.19
         with:
           commit_message: "update version to the Chart.yaml"
-          repo: coralogix/integration-definitions
+          repo: guyrenny/test
           branch: ${{env.branch_name}}
           file_pattern: '*.yaml *.md'
         env:
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
 
       - name: Create pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
@@ -101,4 +101,4 @@ jobs:
           fi
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
