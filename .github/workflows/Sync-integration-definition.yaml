@@ -2,8 +2,8 @@ name: Sync with integration-definitions
 on: 
   push:
     branches: [master]
-    paths:
-    - 'otel-integration/k8s-helm/Chart.yaml'
+    # paths:
+    # - 'otel-integration/k8s-helm/Chart.yaml'
   workflow_dispatch:
 jobs:
   Get_vesrion:
@@ -95,7 +95,7 @@ jobs:
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
           branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
-          Pr_name=$(echo "${{ github.sha }}")
+          Pr_name=$(echo "${{ github.event.commits[0].message }}")
           if [ -z "$Pr_name" ]; then
             Pr_name="sync-from-telemetry-shippers"
           fi
