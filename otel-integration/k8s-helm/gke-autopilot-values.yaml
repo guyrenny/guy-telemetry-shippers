@@ -5,6 +5,7 @@ global:
   defaultSubsystemName: "integration"
   logLevel: "warn"
 
+
   extensions:
     kubernetesDashboard:
       enabled: true
