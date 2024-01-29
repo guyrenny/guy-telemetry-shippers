@@ -2,8 +2,8 @@ name: Sync with integration-definitions
 on: 
   push:
     branches: [master]
-    # paths:
-    # - 'otel-integration/k8s-helm/Chart.yaml'
+    paths:
+    - 'otel-integration/k8s-helm/Chart.yaml'
   workflow_dispatch:
 jobs:
   Get_vesrion:
