@@ -9,7 +9,6 @@ global:
     kubernetesDashboard:
       enabled: true
 
-# set distribution to openshift for openshift clusters
 distribution: ""
 opentelemetry-agent:
   enabled: true

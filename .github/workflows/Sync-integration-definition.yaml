@@ -98,7 +98,7 @@ jobs:
           Pr_name=$(curl -s -H "Authorization: Bearer ${{ secrets.DESTINATION_REPO_TOKEN }}" \
           "https://api.github.com/repos/guyrenny/telemetry-shippers/pulls?state=closed&base=master&sort=updated&direction=desc" \
           | jq -r '.[0].title')
-          if [ -z "$Pr_name" ]; then
+          if [ "${{ github.event_name == 'workflow_dispatch' }}" ]; then
             Pr_name="sync-from-telemetry-shippers"
           fi
           gh pr create --base master --head "${branch_name}" --title "${Pr_name}" --body "This pull request syncs the changes from the cloudformation repo to this repo."
