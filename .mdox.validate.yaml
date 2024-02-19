@@ -4,7 +4,7 @@ cache:
   type: 'SQLite'
 
 validators: 
-  - regex: 'https://github.com/coralogix/telemetry-shippers/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
+  - regex: 'issue'
     type: 'githubPullsIssues'
   # Ignore links that includes 'assets' because the generated content will resolve them correctly.
   - regex: '.+/a/.+'
