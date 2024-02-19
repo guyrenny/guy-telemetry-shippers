@@ -59,7 +59,7 @@ The best way to reach us with a question when contributing is to ask on the orig
 
 You must have a Helm Chart CLI available in your environment to install the charts on this repository.
 
-If you don't have Helm installed yet, please check the official Helm documentation [here](https://helm.sh/docs/helm/helm_install/no_link).
+If you don't have Helm installed yet, please check the official Helm documentation [here](https://helm.sh/docs/helm/helm_install/).
 
 ## Sign Your Commits
 
