@@ -1,6 +1,5 @@
 # Contributing Guide
 
-
 * [New Contributor Guide](#contributing-guide)
   * [Ways to Contribute](#ways-to-contribute)
   * [Find an Issue](#find-an-issue)
