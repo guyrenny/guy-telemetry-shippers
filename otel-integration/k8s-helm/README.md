@@ -97,6 +97,7 @@ type: Opaque
 > installation process and the chart will be installed successfully. If you do
 > not wish to see these warnings, we recommend downgrading your Helm version.
 > ```
+
 First make sure to add our Helm charts repository to the local repos list with
 the following command:ke sure to add our Helm charts repository to the local repos list with the following command:
 
