@@ -156,7 +156,7 @@ type: Opaque
 >
 > " from
 > <path>
-> 
+>
 > : validation: more than one dependency with name or
 > alias "opentelemetry-collector"
 >
