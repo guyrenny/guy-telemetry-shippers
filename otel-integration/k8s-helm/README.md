@@ -153,7 +153,7 @@ type: Opaque
 > index.go:366: skipping loading invalid entry for chart "otel-integration"
 > "
 > <version>
-> 
+>
 > " from
 > <path>
 > 
