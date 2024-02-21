@@ -151,6 +151,7 @@ type: Opaque
 > multiple warning messages during the installation about following:
 
 > index.go:366: skipping loading invalid entry for chart "otel-integration" \<version> from \<path>: validation: more than one dependency with name or alias "opentelemetry-collector"
+>
 > ```
 > This is due to a recently introduced validation bug in Helm (see this
 > [issue](https://github.com/helm/helm/issues/12748)). This does not affect the
