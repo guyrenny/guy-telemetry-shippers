@@ -86,6 +86,7 @@ type: Opaque
 ```
 
 # Installation
+
 > [!NOTE] As of latest Helm version (`v3.14.0`), users might experience warning
 > multiple warning messages during the installation about following:
 > index.go:366: skipping loading invalid entry for chart "otel-integration" \<version> from \<path>: validation: more than one dependency with name or alias "opentelemetry-collector"
