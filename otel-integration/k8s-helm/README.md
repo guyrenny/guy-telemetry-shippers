@@ -153,8 +153,10 @@ type: Opaque
 > index.go:366: skipping loading invalid entry for chart "otel-integration"
 > "
 > <version>
+> 
 > " from
 > <path>
+> 
 > : validation: more than one dependency with name or
 > alias "opentelemetry-collector"
 >
@@ -395,7 +397,7 @@ Applications can send OTLP Metrics and Jaeger, Zipkin and OTLP traces to the
 local nodes, as `otel-agent` is using hostNetwork .
 
 | Protocol              | Port  |
-| --------------------- | ----- |
+|-----------------------|-------|
 | Zipkin                | 9411  |
 | Jaeger GRPC           | 6832  |
 | Jaeger Thrift binary  | 6832  |
@@ -429,7 +431,7 @@ optimal default experience, we recommend using the 30 second interval set by the
 chart. However, if you'd prefer to collect metrics more (or less) often, you can
 adjust the interval by changing the `global.collectionInterval` value in the
 `values.yaml` file. The minimal recommended global interval is `15s`. If you
-wish to use default value for _each_ component set internally by the collector,
+wish to use default value for *each* component set internally by the collector,
 you can remove the collection interval parameter from presets completely.
 
 Beware that using lower interval will result in more metric data points being
@@ -486,7 +488,7 @@ SimpleSpanProcessor to BatchSpanProcessor and noticed a massive performance
 improvement in the collector:
 
 | Span Processor      | Agent Memory Usage | Agent CPU Usage | Latency Samples |
-| ------------------- | ------------------ | --------------- | --------------- |
+|---------------------|--------------------|-----------------|-----------------|
 | SimpleSpanProcessor | 3.7 GB             | 0.5             | >1m40s          |
 | BatchSpanProcessor  | 600 MB             | 0.02            | >1s <10s        |
 
