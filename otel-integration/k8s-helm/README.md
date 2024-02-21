@@ -338,7 +338,7 @@ You can enhance metrics telemetry level using `level` field. The following is a 
 - "normal" adds some other indicators on top of basic.
 - "detailed" adds dimensions and views to the previous levels.
 
-For example: 
+For example:
 
 ```yaml
 service:
