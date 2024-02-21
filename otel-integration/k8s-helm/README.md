@@ -172,6 +172,7 @@ When running in Windows environments, please use `values-windows-tailsampling.ya
 #### Why am I getting ResourceExhausted errors when using Tail Sampling?
 
 Typically, the errors look like this:
+
 ```
 not retryable error: Permanent error: rpc error: code = ResourceExhausted desc = grpc: received message after decompression larger than max (5554999 vs. 4194304)
 ```
@@ -337,7 +338,8 @@ You can enhance metrics telemetry level using `level` field. The following is a 
 - "normal" adds some other indicators on top of basic.
 - "detailed" adds dimensions and views to the previous levels.
 
-For example:
+For example: 
+
 ```yaml
 service:
   telemetry:
