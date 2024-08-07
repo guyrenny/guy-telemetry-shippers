@@ -2,6 +2,12 @@
 
 ## Fluentd
 
+### v1.16.5 / 2024-04-25
+* [UPGRADE] Upgrade Fluentd Helm chart dependency to 0.5.2
+
+### v1.16.5 / 2024-04-24
+* [UPGRADE] Upgrade Fluentd version to v1.16.5
+
 ### v1.16.3 / 2023-11-23
 
 * [CHANGE] Update the coralogix API
@@ -40,6 +46,16 @@
   ([#41](https://github.com/coralogix/eng-integrations/pull/41))
 
 ## Fluent-Bit
+
+## v3.0.4 / 2024-05-21
+
+* [UPGRADE] Upgrade Fluentbit version to v3.0.4 for CVE-2024-4323
+* [UPGRADE] Upgrade Fluentbit Helm chart dependency to 0.46.7 for CVE-2024-4323
+
+### v3.0.2 / 2024-04-24
+
+* [UPGRADE] Upgrade Fluentbit version to v3.0.2
+* [UPGRADE] Upgrade Fluentbit Helm chart dependency to 0.46.2
 
 ### v2.2.0 / 2023-11-23
 

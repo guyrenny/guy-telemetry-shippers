@@ -2,6 +2,147 @@
 
 ## OpenTelemtry-Integration
 
+## v0.0.93 / 2024-08-06
+- [Feat] Add more defaults for fleet management preset
+
+## v0.0.92 / 2024-08-05
+- [Feat] add more system attributes to host entity event preset
+- [Feat] Add fleet management preset
+
+## v0.0.91 / 2024-08-05
+- [Feat] add more attributes to host entity event preset
+
+## v0.0.90 / 2024-07-31
+- [:warning: CHANGE] [FEAT] Bump collector version to `0.106.1`. If you're using your custom configuration that relies on implicit conversion of types, please see the note about change in behavior in the [`UPGRADING.md`](./UPGRADING.md)
+- [Fix] Mute process executable errors in host metrics
+
+### v0.0.89 / 2024-07-29
+- [Feat] add host entity event preset
+
+### v0.0.88 / 2024-07-26
+- [Feat] add kubernetes resource preset
+
+### v0.0.87 / 2024-07-18
+- [FEAT] Add process option to hostmetrics preset to scrape process metrics.
+
+### v0.0.86 / 2024-07-08
+- [FEAT] Update Windows collector image to `0.104.0`
+- [FEAT] Update values file to be in sync with Linux agents.
+
+### v0.0.85 / 2024-07-03
+- [:warning: CHANGE] [FEAT] Bump collector version to `0.104.0`. If you are providing your own environemnt variables that are being expanded in the collector configuration, be sure to use the recommended syntax with the `env:` prefix (for example: `${env:ENV_VAR}` instead of just `${ENV_VAR}`). For more information see [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.104.0). The old way of setting environment variables will be removed in the near future.
+
+### v0.0.84 / 2024-06-26
+- [Fix] Add azure to resource detection processor
+
+### v0.0.83 / 2024-06-26
+- [Fix] Add cluster.name and resource detection processors to gateway-collector metrics
+
+### v0.0.82 / 2024-06-26
+- [Fix] Add k8s labels to gateway-collector metrics
+
+### v0.0.81 / 2024-06-26
+- [Fix] Allow configuring max_unmatched_batch_size in multilineConfigs. Default is changed to max_unmatched_batch_size=1.
+- [Fix] Fix spanMetrics.spanNameReplacePattern preset does not work
+
+### v0.0.80 / 2024-06-20
+- [BREAKING] logging exporter is removed from default exporters list, since collector 0.103.0 removed it.
+
+### v0.0.79 / 2024-06-06
+- [FEAT] Update Target Allocator version to 0.101.0
+
+### v0.0.78 / 2024-06-06
+- [FEAT] Bump Collector to 0.102.1
+- [FIX] Important: This version contains fix for cve-2024-36129. For more information see https://opentelemetry.io/blog/2024/cve-2024-36129/
+
+### v0.0.77 / 2024-06-05
+- [FIX] Fix target allocator add events and secrets permission
+
+### v0.0.76 / 2024-06-03
+- [FEAT] Add Kubernetes metadata to otel collector metrics
+
+### v0.0.75 / 2024-06-03
+- [FEAT] Add status_code to spanmetrics preset
+
+### v0.0.74 / 2024-05-28
+- [FEAT] Bump Collector to 0.101.0
+- [FEAT] Allow setting dimensions to spanMetricsMulti preset
+
+### v0.0.73 / 2024-05-28
+- [FEAT] Bump Helm chart dependencies.
+- [FEAT] Allowing loadBalancing presets dns configs (timout and resolver interval).
+
+### v0.0.72 / 2024-05-16
+- [FEAT] Bump Collector to 0.100.0
+- [FEAT] Add container CPU throttling metrics
+- [FEAT] Add k8s_container_status_last_terminated_reason metric to track OOMKilled events.
+
+### v0.0.71 / 2024-05-06
+
+- [Fix] reduceResourceAttributes preset will now work when metadata preset is manually set in processors.
+
+### v0.0.70 / 2024-04-29
+- [FEAT] Bump Collector to 0.99.0.
+- [BREAKING] GRPC/HTTP client metrics are now reported only when using `detailed` level.
+
+### v0.0.69 / 2024-04-17
+
+- [Fix] When routing processor with batch is used make sure routing processor is last.
+
+### v0.0.68 / 2024-04-04
+
+- [FEAT] Add config for metrics expiration in span metrics presets
+- [FEAT] Bump Collector to 0.97.0
+
+### v0.0.67 / 2024-04-02
+
+- [FIX] Operator generate CRD missing environment variables
+- [FEAT] Add new reduceResourceAttributes preset, which removes uids and other unnecessary resource attributes from metrics.
+
+### v0.0.66 / 2024-03-26
+
+- [FEAT] add spanMetricsMulti preset, which allows to specify histogram buckets per application.
+
+### v0.0.65 / 2024-03-19
+
+- [FIX] logsCollection preset make force_flush_period configurable and disable it by default.
+
+### v0.0.64 / 2024-03-15
+
+- [FIX] Add logsCollection fix for empty log lines.
+
+### v0.0.63 / 2024-03-12
+
+- [FIX] Use default processing values for `tailsamplingprocessor`
+- [FIX] Remove duplicated `tailsamplingprocessor` configuration; keep it only in the `tail-sampling-values.yaml` file
+
+### v0.0.62 / 2024-03-07
+
+- [:warning: CHANGE] [CHORE] Update collector to version `0.96.0`. If you are using the deprecated `spanmetricsprocessor`, please note it is no longer available in version `0.96.0`. Please use `spanmetricsconnector` instead or use our [span metrics preset](https://github.com/coralogix/telemetry-shippers/tree/master/otel-integration/k8s-helm#about-span-metrics)
+- [CHORE] Update Windows collector image and version `0.96.0`
+- [CHORE] Use the upstream image of target allocator instead of custom fork
+
+### v0.0.61 / 2024-03-06
+
+- [FEAT] Add support for multiline configs based on namespace name / pod name / container name.
+
+### v0.0.60 / 2024-03-01
+
+- [FEAT] Configure batch processor sizes with hard limit 2048 units
+- [FIX] Ensure batch processors is always last in the pipeline
+
+### v0.0.59 / 2024-03-01
+
+- [CHORE] Add otel-integration version header to coralogix exporter
+
+### v0.0.58 / 2024-02-21
+
+- [Fix] Change default spanmetrics connector's buckets and extra dimensions.
+
+### v0.0.57 / 2024-02-21
+
+- [Fix] Bump otel-gateway's otlp server grpc request size limit to 20 mib
+
 ### v0.0.56 / 2024-02-13
 
 - [CHORE] Bump windows image to 0.93.0 for windows values files.

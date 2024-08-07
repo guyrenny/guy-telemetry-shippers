@@ -33,7 +33,7 @@ The included agent provides:
 - [Kubelet Metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/kubeletstatsreceiver) - Fetches running container metrics from the local Kubelet.
 - [OTLP Metrics](https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md) - Send application metrics via OpenTelemetry protocol.
 - Traces - You can send data in various format, such as [Jaeger](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/jaegerreceiver), [OpenTelemetry Protocol](https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md) or [Zipkin](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zipkinreceiver).
-- [Span Metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/spanmetricsprocessor) - Traces are converted to Requests, Duration and Error metrics using spanmetrics processor.
+- [Span Metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector/README.md) - Optional Traces are converted to Requests, Duration and Error metrics using spanmetrics connector.
 - [Zpages Extension](https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension/zpagesextension) - You can investigate latency and error issues by navigating to Pod's localhost:55516 web server. Routes are desribed in [OpenTelemetry documentation](https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension/zpagesextension#exposed-zpages-routes)
 
 ## OpenTelemetry Cluster Collector
@@ -53,6 +53,77 @@ This chart will also collect, out of the box, all the metrics necessary for [Cor
 **Please be aware** that certain metrics collected by for the dashboard have high cardinality, which means that the number of unique values for a given metric is high and might result in higher costs connected with metrics ingestion and storage. This is applies in particular to the pod related metrics `kube_pod_status_reason`, `kube_pod_status_phase` and `kube_pod_status_qos_class`.
 
 If you do not require to collect these metrics, you can disable them by setting `global.extensions.kubernetesDashboard.enabled` to `false` in the `values.yaml` file.
+
+## Metrics
+
+OpenTelemetry integration collects metrics from various sources. You can see the list of metrics and their labels in OpenTelemetry Collector contrib receiver documentation:
+
+- Kubernetes Cluster Receiver - https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/k8sclusterreceiver/documentation.md
+- Kubelet Stats Receiver - https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver/metadata.yaml
+- Host Metrics Receiver - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/hostmetricsreceiver
+
+Additionally, we use [k8sattributes processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor) and [resource detection processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourcedetectionprocessor) to add more metadata labels.
+
+For Kubernetes Dashboard we also use [Prometheus receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md) to scrape Kubernetes API Server and [Kubelet cAdvisor](https://kubernetes.io/docs/concepts/cluster-administration/system-metrics/) endpoints.
+
+Note: OpenTelemetry metrics are converted to Prometheus format following [OpenTelemetry specification](https://opentelemetry.io/docs/specs/otel/compatibility/prometheus_and_openmetrics/#otlp-metric-points-to-prometheus)
+
+## Custom Metrics
+
+OpenTelemetry Integration additionally adds these custom metrics:
+
+### kube_pod_status_qos_class
+
+Provides information about Pod QOS class.
+
+| Metric Type | Value | Labels |
+|-------------|-------|--------|
+| Gauge       | 1     | reason |
+
+### kube_pod_status_reason
+
+Provides information about Kubernetes Pod Status.
+
+| Metric Type | Value | Labels |
+|-------------|-------|--------|
+| Gauge       | 1     | reason |
+
+Example reason label keys: Evicted, NodeAffinity, NodeLost, Shutdown, UnexpectedAdmissionError
+
+### kube_node_info
+
+Provides information about Kubernetes Node.
+
+| Metric Type | Value | Labels              |
+|-------------|-------|---------------------|
+| Gauge       | 1     | k8s.kubelet.version |
+
+### k8s.container.status.last_terminated_reason
+
+Provides information about Pod's last termination.
+
+| Metric Type | Value | Labels |
+|-------------|-------|--------|
+| Gauge       | 1     | reason |
+
+Example reason label keys: OOMKilled
+
+### kubernetes_build_info
+
+Provides information about Kubernetes version.
+
+### Container Filesystem usage metrics
+
+- container_fs_writes_total
+- container_fs_reads_total
+- container_fs_writes_bytes_total
+- container_fs_reads_bytes_total
+- container_fs_usage_bytes
+
+### CPU throttling metrics
+
+- container_cpu_cfs_periods_total
+- container_cpu_cfs_throttled_periods_total
 
 # Prerequisites
 
@@ -87,12 +158,15 @@ type: Opaque
 
 # Installation
 
-> [!NOTE]  
-> As of latest Helm version (`v3.14.0`), users might experience warning multiple warning messages during the installation about following:
+> [!NOTE]
+> With some Helm version (< `v3.14.3`), users might experience multiple warning messages during the installation about following:
+>
 > ```
-> index.go:366: skipping loading invalid entry for chart "otel-integration" "<version>" from <path>: validation: more than one dependency with name or alias "opentelemetry-collector"
+> index.go:366: skipping loading invalid entry for chart "otel-integration" \<version> from \<path>: validation: more than one dependency with name or alias "opentelemetry-collector"
+>
 > ```
->This is due to a recently introduced validation bug in Helm (see this [issue](https://github.com/helm/helm/issues/12748)). This does not affect the installation process and the chart will be installed successfully. If you do not wish to see these warnings, we recommend downgrading your Helm version.
+>
+> This is due to a validation bug in Helm (see this [issue](https://github.com/helm/helm/issues/12748)). This does not affect the installation process and the chart will be installed successfully. If you do not wish to see these warnings, we recommend either upgrading to the latest Helm version, or downgrading to a version not affected by the issue.
 
 First make sure to add our Helm charts repository to the local repos list with the following command:
 
@@ -149,6 +223,15 @@ helm upgrade --install otel-coralogix-integration coralogix-charts-virtual/otel-
   --render-subchart-notes -f values-crd-override.yaml --set global.clusterName=<cluster_name> --set global.domain=<domain>
 ```
 
+> [!NOTE]
+> Users might experience multiple warning messages during the installation about following:
+>
+> ```
+> Warning: missing the following rules for namespaces: [get,list,watch]
+> ```
+>
+> This is due to a bug in Opentelemetry (see this [issue](https://github.com/open-telemetry/opentelemetry-operator/issues/2685)). This does not affect the installation process and the chart will be installed successfully.
+
 ### Enabling Tail Sampling
 
 If you want to use [Tail Sampling](https://opentelemetry.io/docs/concepts/sampling/#tail-sampling) to reduce the amount of traces using [tail sampling processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) you can install `otel-integration` using `tail-sampling-values.yaml` values. For example:
@@ -160,10 +243,33 @@ helm upgrade --install otel-coralogix-integration coralogix-charts-virtual/otel-
   --render-subchart-notes -f tail-sampling-values.yaml
 ```
 
-This change will configure otel-agent pods to send span data to coralogix-opentelemetry-gateway deployment using [loadbalancing exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter). Make sure to configure enough replicas and resource requests and limits to handle the load. Next, you will need to configure [tail sampling processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor)  policies with your custom tail sampling policies.
+This change will configure otel-agent pods to send span data to coralogix-opentelemetry-gateway deployment using [loadbalancing exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/loadbalancingexporter). Make sure to configure enough replicas and resource requests and limits to handle the load. Next, you will need to configure [tail sampling processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor) policies with your custom tail sampling policies.
 
 When running in Openshift make sure to set `distribution: "openshift"` in your `values.yaml`.
 When running in Windows environments, please use `values-windows-tailsampling.yaml` values file.
+
+#### Why am I getting ResourceExhausted errors when using Tail Sampling?
+
+Typically, the errors look like this:
+
+```
+not retryable error: Permanent error: rpc error: code = ResourceExhausted desc = grpc: received message after decompression larger than max (5554999 vs. 4194304)
+```
+
+By default, OTLP Server has a single grpc request size 4MiB limit. This limit might breached when openetelemtry-agent sends the trace data using loadbalancing exporter to the gateway's OTLP Server. To fix this you should change the limit to a bigger value. For example:
+
+```
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        max_recv_msg_size_mib: 20
+```
+
+References:
+- OTLP Receiver config - https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md
+- GRPC settings for this config - https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configgrpc/README.md#server-configuration
+- Default msg size limit of GRPC servers - https://pkg.go.dev/google.golang.org/grpc#MaxRecvMsgSize
 
 ### Enabling scraping of Prometheus custom resources (`ServiceMonitor` and `PodMonitor`)
 
@@ -276,11 +382,28 @@ env:
     value: "http://$(NODE):4317"
 ```
 
-### About global collection interval
+### About global collection interval
 
 The global collection interval (`global.collectionInterval`) is the interval in which the collector will collect metrics from the configured receivers. For most optimal default experience, we recommend using the 30 second interval set by the chart. However, if you'd prefer to collect metrics more (or less) often, you can adjust the interval by changing the `global.collectionInterval` value in the `values.yaml` file. The minimal recommended global interval is `15s`. If you wish to use default value for *each* component set internally by the collector, you can remove the collection interval parameter from presets completely.
 
 Beware that using lower interval will result in more metric data points being sent to the backend, thus resulting in more costs. Note that the choise of the interval also has an effect on behavior of rate functions, for more see [here](https://www.robustperception.io/what-range-should-i-use-with-rate/).
+
+### About batch sizing
+
+[Batch processor](https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor) ensures that the telemetry being sent to Coralogix backend is batched into bigger requests, ensuring lower networking overhead and better performance. The batching processor is enabled by default and we strongly recommend to use it. By default, the `otel-integration` chart uses the following recommended settings for batch processors in all collectors:
+
+```yaml
+    batch:
+      send_batch_size: 1024
+      send_batch_max_size: 2048
+      timeout: "1s"
+```
+
+These settings imposes a hard limit of 2048 units (spans, metrics, logs) on the batch size, ensuring a balance between the recommended size of the batches and networking overhead.
+
+You may adjust these settings according to your needs, but when configuring the batch processor by yourself, it is important to be mindful of the size limites imposed by the Coraloigx endpoints (currently **max. 10 MB** after decompression - see [documentation](https://coralogix.com/docs/opentelemetry/#limits--quotas)).
+
+More information on how to configure the batch processor can be found [here](https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor#batch-processor).
 
 ### About span metrics
 
@@ -299,6 +422,165 @@ spanNameReplacePattern:
 ```
 
 This will result in your spans having generalized name `user-{id}`.
+
+#### Span metrics with different buckets per application
+
+If you want to use Span Metrics connector with different buckets per application you need to use `spanMetricsMulti` preset. For example:
+
+```yaml
+  presets:
+    spanMetricsMulti:
+      enabled: false
+      defaultHistogramBuckets: [1ms, 4ms, 10ms, 20ms, 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s]
+      configs:
+        - selector: route() where attributes["service.name"] == "one"
+          histogramBuckets: [1s, 2s]
+        - selector: route() where attributes["service.name"] == "two"
+          histogramBuckets: [5s, 10s]
+```
+
+For selector you need to write a [OTTL](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/README.md) statement, more information is available in [routing connector docs](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/routingconnector).
+
+### Multi-line log configuration
+
+This helm chart supports multi-line configurations for different namespace, pod, and/or container names. The following example configuration applies a specific firstEntryRegex for a container which is part of a x Pod in y namespace:
+
+```yaml
+  presets:
+    logsCollection:
+      enabled: true
+      multilineConfigs:
+        - namespaceName:
+            value: kube-system
+          podName:
+            value: app-a.*
+            useRegex: true
+          containerName:
+            value: http
+          firstEntryRegex: ^[^\s].*
+          combineWith: ""
+        - namespaceName:
+            value: kube-system
+          podName:
+            value: app-b.*
+            useRegex: true
+          containerName:
+            value: http
+          firstEntryRegex: ^[^\s].*
+          combineWith: ""
+        - namespaceName:
+            value: default
+          firstEntryRegex: ^[^\s].*
+          combineWith: ""
+
+```
+
+This feature uses [filelog receiver's](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md) [router](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/stanza/docs/operators/router.md) and [recombine](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/stanza/docs/operators/recombine.md) operators.
+
+Alternatively, you can add a recombine filter at the end of log collection operators using `extraFilelogOperators` field. The following example adds a single recombine operator for all Kubernetes logs:
+
+```yaml
+  presets:
+    logsCollection:
+      enabled: true
+      extraFilelogOperators:
+        - type: recombine
+          combine_field: body
+          source_identifier: attributes["log.file.path"]
+          is_first_entry: body matches "^(YOUR-LOGS-REGEX)"
+```
+
+# Troubleshooting
+
+## Metrics
+
+You can enhance metrics telemetry level using `level` field. The following is a list of all possible values and their explanations.
+
+- "none" indicates that no telemetry data should be collected;
+- "basic" is the recommended and covers the basics of the service telemetry.
+- "normal" adds some other indicators on top of basic.
+- "detailed" adds dimensions and views to the previous levels.
+
+For example:
+
+```yaml
+service:
+  telemetry:
+    metrics:
+      level: detailed
+      address: ":8888"
+```
+
+This adds more metrics around exporter latency and various processors metrics.
+
+## Traces
+
+OpenTelemetry Collector has an ability to send it's own traces using OTLP exporter. You can send the traces to OTLP server running on the same OpenTelemetry Collector, so it goes through configured pipelines. For example:
+
+```
+service:
+  telemetry:
+    traces:
+      processors:
+        batch:
+          exporter:
+            otlp:
+              protocol: grpc/protobuf
+              endpoint: ${env:MY_POD_IP}:4317
+```
+
+# Filtering and reducing metrics cost.
+
+otel-integration has a couple of ways you can reduce the metric cost. One simple way is to enable `reduceResourceAttributes` preset, which removes the following list of resource attributes that are typically not used:
+- container.id
+- k8s.pod.uid
+- k8s.replicaset.uid
+- k8s.daemonset.uid
+- k8s.deployment.uid
+- k8s.statefulset.uid
+- k8s.cronjob.uid
+- k8s.job.uid
+- k8s.hpa.uid
+- k8s.namespace.uid
+- k8s.node.uid
+- net.host.name
+- net.host.port
+
+Kubernetes resource attributes are typically coming from [Kubernetes Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/k8sattributesprocessor/README.md) and [Kubernetes Cluster receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/k8sclusterreceiver).
+
+While `net.host.name` and `net.host.port` is coming from Prometheus receiver, instead of using these attributes you can use the `service.instance.id` attribute, which has a combination of host and port.
+
+## Custom filtering
+
+Alternatively, you can also use include / exclude filters to collect only metrics about needed objects. For example, the following configuration allows you to exclude `kube-*` and `default` namespace Kubernetes metrics. This filtering is available on many [mdatagen](https://github.com/open-telemetry/opentelemetry-collector/tree/main/cmd/mdatagen) based receiver.
+
+For example:
+
+```yaml
+receivers:
+  k8s_cluster:
+    collection_interval: 10s
+    allocatable_types_to_report: [cpu, memory]
+    resource_attributes:
+      k8s.namespace.name:
+        metrics_exclude:
+          - regexp: kube-.*
+          - strict: default
+```
+
+## Dropping data using processors
+
+Alternatively you can use [OpenTelemetry Transformation Language](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/README.md) with [filter](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor) processor to filter out unneeded data. The following example drops metrics named `my.metric` and any metrics with resource where attribute `my_label` equals `abc123`:
+
+```yaml
+processors:
+  filter/ottl:
+    error_mode: ignore
+    metrics:
+      metric:
+          - name == "my.metric" 
+          - resource.attributes["my_label"] == "abc123"
+```
 
 # Performance of the Collector
 

@@ -61,12 +61,16 @@ In order to allow container access to the S3 object, you'll need to provide the 
 		{
 			"Effect": "Allow",
 			"Action": [
-				"s3:GetObject",
 				"s3:GetBucketLocation"
 			],
 			"Resource": "<Your specific bucket ARN>"
-            #or
-            "Resource": "*"
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject"
+			],
+			"Resource": "<Your specific bucket ARN>/*"
 		}
 	]
 }
@@ -93,4 +97,15 @@ To do so, you'd add this "logConfiguration" section to each of your application 
                     "compress": "gzip"
                 }
             }
+```
+
+**NOTE:** If you wish to store your Coralogix Privatekey in Secrets Manager, you can remove the `"Header"` from `"options"` and create one under `"secretOptions"` and reference the Secret's ARN. Store the secret as plaintext with the same format as above. You will also need to add the secretsmanager:GetSecretValue permission to your ecs Task Execution Role.
+
+```
+"secretOptions": [
+    {
+        "name": "Header",
+        "valueFrom": "arn:aws:secretsmanager:us-east-1:<redacted>:secret:<redacted>"
+    }
+]
 ```
