@@ -30,8 +30,8 @@ jobs:
       - name: Checkout destination repository
         uses: actions/checkout@v4
         with:
-          repository: guyrenny/test
-          token: ${{ secrets.DESTINATION_REPO_TOKEN }}
+          repository: coralogix/integration-definitions
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Check if version exists
         id: version_exist
@@ -82,15 +82,15 @@ jobs:
           fi
           echo "merged_pr_from_telemetry_shipper=$merged_pr_from_telemetry_shipper" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: commit change
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         uses: planetscale/ghcommit-action@v0.1.43
         with:
           commit_message: ${{env.merged_pr_from_telemetry_shipper}}
-          repo: guyrenny/test
+          repo: coralogix/integration-definitions
           branch: master
           file_pattern: '*.yaml *.md'
         env:
-          GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
