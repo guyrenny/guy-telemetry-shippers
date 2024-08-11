@@ -74,7 +74,7 @@ jobs:
           fi
           git add .
 
-          merged_pr_from_telemetry_shipper=$(curl -s -H "Authorization: Bearer ${{ secrets.DESTINATION_REPO_TOKEN }}" \
+          merged_pr_from_telemetry_shipper=$(curl -s \
           "https://api.github.com/repos/coralogix/telemetry-shippers/pulls?state=closed&base=master&sort=updated&direction=desc" \
           | jq -r '.[0].title')
           if [ "${{ github.event_name }}" == 'workflow_dispatch' ] || [ -z "$merged_pr_from_telemetry_shipper" ]; then
