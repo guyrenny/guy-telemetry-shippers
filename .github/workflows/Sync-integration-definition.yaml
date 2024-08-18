@@ -49,6 +49,8 @@ jobs:
       - name: Create files for the new version
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
+          branch_name="sync-telemetry-branch-$(date +"%m-%d-%H-%M")"
+          echo "branch_name=$branch_name" >> $GITHUB_ENV
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git checkout master
@@ -90,7 +92,34 @@ jobs:
         with:
           commit_message: ${{env.commit_message}}
           repo: guyrenny/test
-          branch: master
+          branch: ${{ env.branch_name }}
           file_pattern: '*.yaml *.md'
         env:
           GITHUB_TOKEN: ${{secrets.DESTINATION_REPO_TOKEN}}
+  
+      - name: Create pull request
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
+        run: |
+          
+          Pr_name=$(curl -s \
+          "https://api.github.com/repos/coralogix/telemetry-shippers/pulls?state=closed&base=master&sort=updated&direction=desc" \
+          | jq -r '.[0].title')
+          if [ "${{ github.event_name }}" == 'workflow_dispatch' ] || [ -z "$Pr_name" ]; then
+            Pr_name="sync-from-telemetry-shippers"
+          fi
+          pr_url=$(curl -s \
+            "https://api.github.com/repos/coralogix/telemetry-shippers/pulls?state=closed&base=master&sort=updated&direction=desc" \
+            | jq -r '.[0].html_url')
+          gh pr create --base master --head "${{ env.branch_name }}" --title "${Pr_name}" --body "This pull request syncs the changes from the telemetry-shippers repo to this repo. link to the original PR $pr_url"
+        env:
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
+
+      - name: marge pull request
+        if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
+        run: |
+            gh pr merge --auto --squash --merge "${{ env.branch_name }}"
+          # gh api -XPOST /repos/coralogix/eng-kafka/statuses/$(git rev-parse HEAD) -f state=success -f context="ticket-id-validator"
+          # gh api -XPOST /repos/coralogix/eng-kafka/statuses/$(git rev-parse HEAD) -f state=success -f context="All Status Checks"
+          # gh pr merge --delete-branch --admin --squash $CX_ENV_ID
+        env:
+          GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
