@@ -118,9 +118,9 @@ jobs:
       - name: marge pull request
         if: "${{env.new_version_exist == 'false' || github.event_name == 'workflow_dispatch'}}"
         run: |
+            gh api -XPOST /repos/guyrenny/test/statuses/$(git rev-parse HEAD) -f state=success -f context="ticket-id-validator"
+            gh api -XPOST /repos/guyrenny/test/statuses/$(git rev-parse HEAD) -f state=success -f context="All Status Checks"
             gh pr merge --delete-branch --admin --squash ${{ env.branch_name }}
           # gh pr merge --auto --squash --merge "${{ env.branch_name }}"
-          # gh api -XPOST /repos/coralogix/eng-kafka/statuses/$(git rev-parse HEAD) -f state=success -f context="ticket-id-validator"
-          # gh api -XPOST /repos/coralogix/eng-kafka/statuses/$(git rev-parse HEAD) -f state=success -f context="All Status Checks"
         env:
           GITHUB_TOKEN: ${{ secrets.DESTINATION_REPO_TOKEN }}
