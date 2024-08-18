@@ -53,11 +53,11 @@ jobs:
           echo "branch_name=$branch_name" >> $GITHUB_ENV
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git checkout $branch_name
+          git checkout -b $branch_name
           git pull origin master
           git fetch origin
           git push origin $branch_name
-          
+
           current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           template_version=${{ needs.Get_vesrion.outputs.Chart_version }}
           mkdir -p integrations/otel-agent-k8s/v${template_version}
